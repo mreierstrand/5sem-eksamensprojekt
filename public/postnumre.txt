@@ -1,0 +1,48 @@
+async getKom(){
+ var response = await fetch("https://api.dataforsyningen.dk/RestGeokeys_v2?method=postdistrikt&postnavn=**&f=jsonp&callback=i&token=4f570a32423341d30d4019c856827605&hits=10000")
+
+ 
+
+  let text = (await response.text()).replace(/^i+\(/, '').replace(/\)+;/,'' )
+
+  let result = JSON.parse(text)
+
+  this.Kommune = result.features 
+
+
+ 
+   if(this.Kommune){
+
+      this.Kommune.forEach( kom =>{
+
+        firebase.firestore().collection('areas').doc(kom.properties.kode).set({
+        areaName: kom.properties.navn,
+        areaCode: kom.properties.kode
+        }).then(()=> {
+          firebase.firestore().collection('areas').doc(kom.properties.kode).collection('posts').add({
+            postContent: "Din by har ikke nogle opslag endnu, vær den første i din by til at dele noget",
+            postContentImg: 'https://signlabs.dk/editor_png_files/5e2/5e28ccb08bf73-product.png',
+            postName: "Velkommen til "+kom.properties.navn,
+            userId: ''
+          })
+        })
+
+
+      } )
+
+    }  
+
+
+
+  },
+
+
+
+  <ion-list>
+              <ion-item v-for="kom in Kommune" :key="kom?.id">
+                  <ion-text
+                    >Postnummer: {{ kom?.areaCode }} Navn:
+                    {{ kom?.areaName }}</ion-text
+                  >
+                </ion-item> 
+              </ion-list>

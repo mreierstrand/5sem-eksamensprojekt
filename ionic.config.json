@@ -1,0 +1,7 @@
+{
+  "name": "Hjemhed",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
